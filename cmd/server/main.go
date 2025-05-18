@@ -24,9 +24,6 @@ func main() {
 		mu.Lock()
 		clientConn = ws
 		mu.Unlock()
-
-		// Keep connection alive
-		io.Copy(io.Discard, ws)
 	}))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +34,7 @@ func main() {
 			return
 		}
 
+		log.Printf("Received request: %s %s", r.Method, r.URL)
 		// Forward the full HTTP request to the client
 		err := r.Write(clientConn)
 		if err != nil {
@@ -49,6 +47,7 @@ func main() {
 		resp, err := http.ReadResponse(bufio.NewReader(clientConn), r)
 		mu.Unlock()
 		if err != nil {
+			log.Printf("Failed to read response from client: %v\n", err)
 			http.Error(w, "Failed to read response from client", http.StatusInternalServerError)
 			return
 		}
