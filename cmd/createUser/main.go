@@ -13,11 +13,12 @@ import (
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Println("Usage: createuser <username> <password>")
+		fmt.Println("Usage: createuser <username> <password> <issuer>")
 		return
 	}
 	username := os.Args[1]
 	password := os.Args[2]
+	issuer := os.Args[3]
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -25,7 +26,7 @@ func main() {
 	}
 
 	mfaSecret, err := totp.Generate(totp.GenerateOpts{
-		Issuer:      "relay.tdccore.nl",
+		Issuer:      issuer,
 		AccountName: username,
 	})
 	if err != nil {
