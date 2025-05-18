@@ -24,6 +24,8 @@ func main() {
 		mu.Lock()
 		clientConn = ws
 		mu.Unlock()
+
+		select {}
 	}))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
