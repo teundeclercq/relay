@@ -32,20 +32,20 @@ jobs:
         run: |
           echo "Building for ${{ matrix.os }}-${{ matrix.goarch }}"
           mkdir -p dist    
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-server-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/server
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-client-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/client
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-server-${{ matrix.os }}-${{ matrix.goarch }} ./cmd/server
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-client-${{ matrix.os }}-${{ matrix.goarch }} ./cmd/client
 
       - name: Upload server artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tunnel-server-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/tunnel-server-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: tunnel-server-${{ matrix.os }}-${{ matrix.goarch }}
+          path: dist/tunnel-server-${{ matrix.os }}-${{ matrix.goarch }}
 
       - name: Upload client artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tunnel-client-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/tunnel-client-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: tunnel-client-${{ matrix.os }}-${{ matrix.goarch }}
+          path: dist/tunnel-client-${{ matrix.os }}-${{ matrix.goarch }}
 
   release:
     name: Create GitHub Release
