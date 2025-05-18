@@ -31,7 +31,7 @@ jobs:
       - name: Build binary
         run: |
           echo "Building for ${{ matrix.os }}-${{ matrix.goarch }}"
-          mmkdir -p dist    
+          mkdir -p dist    
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-server-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/server
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-client-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/client
 
