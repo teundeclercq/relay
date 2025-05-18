@@ -23,7 +23,7 @@ func InitUserDB(path string) *sql.DB {
 	if err != nil {
 		log.Fatalf("failed to create users table: %v", err)
 	}
-	_, err = db.Exec(`CREATE TABLE sessions (
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS sessions (
   		id TEXT PRIMARY KEY,
   		user_id TEXT NOT NULL,
   		expires_at DATETIME NOT NULL,

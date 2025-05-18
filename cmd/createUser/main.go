@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 3 {
+	if len(os.Args) != 4 {
 		fmt.Println("Usage: createuser <username> <password> <issuer>")
 		return
 	}
