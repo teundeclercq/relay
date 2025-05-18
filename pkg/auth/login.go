@@ -12,8 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var sessionStore = make(map[string]string)
-
 //go:embed templates/login.html
 var loginTemplate string
 
@@ -30,8 +28,8 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		password := r.FormValue("password")
 		token := r.FormValue("token") // optional: validate MFA separately
 
-		var hashed, mfa_secret string
-		err := db.QueryRow("SELECT password, mfa_secret FROM users WHERE username = ?", username).Scan(&hashed, &mfa_secret)
+		var userID, hashed, mfa_secret string
+		err := db.QueryRow("SELECT id, password, mfa_secret FROM users WHERE username = ?", username).Scan(&userID, &hashed, &mfa_secret)
 		if err != nil || bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password)) != nil {
 			tmpl := template.Must(template.New("login").Parse(loginTemplate))
 			tmpl.Execute(w, map[string]string{"Error": "Invalid credentials"})
@@ -45,8 +43,16 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		sid := fmt.Sprintf("sess-%d", time.Now().UnixNano())
+		expiry := time.Now().Add(24 * time.Hour)
+
+		_, err = db.Exec(`INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)`,
+			sid, userID, expiry)
+		if err != nil {
+			http.Error(w, "Failed to create session", http.StatusInternalServerError)
+			return
+		}
+		// Set session cookie
 		http.SetCookie(w, &http.Cookie{Name: "session", Value: sid, Path: "/"})
-		sessionStore[sid] = username
 
 		redirect := r.FormValue("redirect")
 		if redirect != "" {
@@ -57,14 +63,22 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func GetUsernameFromSession(r *http.Request) (string, error) {
+func GetUsernameFromSession(db *sql.DB, r *http.Request) (string, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		return "", err
 	}
-	username, ok := sessionStore[cookie.Value]
-	if !ok {
-		return "", fmt.Errorf("invalid session")
+	var username string
+	var expires time.Time
+
+	err = db.QueryRow(`
+  		SELECT u.username, s.expires_at
+  		FROM sessions s
+  		JOIN users u ON s.user_id = u.id
+  		WHERE s.id = ?`, cookie.Value).Scan(&username, &expires)
+
+	if err != nil || time.Now().After(expires) {
+		return "", fmt.Errorf("invalid or expired session")
 	}
 	return username, nil
 }

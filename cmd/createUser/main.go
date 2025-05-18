@@ -41,9 +41,9 @@ func main() {
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
 		id TEXT PRIMARY KEY,
-		username TEXT UNIQUE,
-		password TEXT,
-		mfa_secret TEXT
+		username TEXT UNIQUE NOT NULL,
+		password TEXT NOT NULL,
+		mfa_secret TEXT NOT NULL
 	)`)
 	if err != nil {
 		log.Fatal(err)
