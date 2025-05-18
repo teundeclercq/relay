@@ -1,33 +1,64 @@
 package main
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
 	"log"
+	"net"
+	"net/http"
 
 	"golang.org/x/net/websocket"
 )
 
 func main() {
-	origin := "http://localhost/"
-	url := "ws://your-server-ip-or-domain:8081/ws" // change this to your real IP or domain
+	relayHost := flag.String("server", "localhost:8081", "Relay server address (host:port)")
+	localTarget := flag.String("local", "localhost:8080", "Local service to tunnel (host:port)")
+	flag.Parse()
 
-	ws, err := websocket.Dial(url, "", origin)
+	wsUrl := fmt.Sprintf("ws://%s/ws", *relayHost)
+	origin := fmt.Sprintf("http://%s", *relayHost)
+
+	log.Printf("Connecting to relay server at %s\n", wsUrl)
+	ws, err := websocket.Dial(wsUrl, "", origin)
 	if err != nil {
 		log.Fatalf("WebSocket dial failed: %v", err)
 	}
 	defer ws.Close()
 
-	message := "Hello from client"
-	_, err = ws.Write([]byte(message))
-	if err != nil {
-		log.Fatalf("Write error: %v", err)
-	}
+	log.Println("Tunnel established. Waiting for requests...")
 
-	var reply = make([]byte, 4096)
-	n, err := ws.Read(reply)
-	if err != nil {
-		log.Fatalf("Read error: %v", err)
-	}
+	for {
+		req, err := http.ReadRequest(bufio.NewReader(ws))
+		if err != nil {
+			log.Printf("Read request error: %v", err)
+			return
+		}
 
-	fmt.Printf("Server replied: %s\n", reply[:n])
+		localConn, err := net.Dial("tcp", *localTarget)
+		if err != nil {
+			log.Printf("Local connection failed: %v", err)
+			return
+		}
+
+		err = req.Write(localConn)
+		if err != nil {
+			log.Printf("Write to local failed: %v", err)
+			localConn.Close()
+			continue
+		}
+
+		resp, err := http.ReadResponse(bufio.NewReader(localConn), req)
+		localConn.Close()
+		if err != nil {
+			log.Printf("Read local response failed: %v", err)
+			continue
+		}
+
+		err = resp.Write(ws)
+		if err != nil {
+			log.Printf("Write back to relay failed: %v", err)
+			return
+		}
+	}
 }

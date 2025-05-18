@@ -1,36 +1,69 @@
 package main
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"sync"
 
 	"golang.org/x/net/websocket"
 )
 
+var mu sync.Mutex
+var clientConn *websocket.Conn
+
 func main() {
+	port := flag.String("port", "8081", "Port to listen on")
+	flag.Parse()
+
 	http.Handle("/ws", websocket.Handler(func(ws *websocket.Conn) {
 		fmt.Println("Client connected")
-		defer ws.Close()
+		mu.Lock()
+		clientConn = ws
+		mu.Unlock()
 
-		buffer := make([]byte, 4096)
-		for {
-			n, err := ws.Read(buffer)
-			if err != nil {
-				log.Println("Read error:", err)
-				return
-			}
-			message := buffer[:n]
-			log.Printf("Received: %s\n", message)
-
-			_, err = ws.Write([]byte("Echo: " + string(message)))
-			if err != nil {
-				log.Println("Write error:", err)
-				return
-			}
-		}
+		// Keep connection alive
+		io.Copy(io.Discard, ws)
 	}))
 
-	fmt.Println("Relay server listening on :8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		if clientConn == nil {
+			mu.Unlock()
+			http.Error(w, "No client connected", http.StatusServiceUnavailable)
+			return
+		}
+
+		// Forward the full HTTP request to the client
+		err := r.Write(clientConn)
+		if err != nil {
+			mu.Unlock()
+			http.Error(w, "Failed to forward request", http.StatusInternalServerError)
+			return
+		}
+
+		// Read the HTTP response from the client
+		resp, err := http.ReadResponse(bufio.NewReader(clientConn), r)
+		mu.Unlock()
+		if err != nil {
+			http.Error(w, "Failed to read response from client", http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
+
+		for k, vv := range resp.Header {
+			for _, v := range vv {
+				w.Header().Add(k, v)
+			}
+		}
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
+	})
+
+	addr := fmt.Sprintf(":%s", *port)
+	fmt.Printf("Relay server listening on %s\n", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
