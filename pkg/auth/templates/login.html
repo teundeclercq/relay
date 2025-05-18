@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - relay.tdccore.nl</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 360px;
+    }
+    .login-container img {
+      display: block;
+      margin: 0 auto 1rem;
+      width: 120px;
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    .login-container .alert {
+      color: #b00020;
+      background-color: #ffebee;
+      border: 1px solid #e57373;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .login-container input[type="submit"] {
+      background-color: #2b7cff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+    .login-container input[type="submit"]:hover {
+      background-color: #195edc;
+    }
+    @media (max-width: 500px) {
+      .login-container {
+        margin: 0 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="/static/logo.png" alt="Relay Logo">
+    <h2>Login to relay.tdccore.nl</h2>
+    <!-- Example flash alert, dynamically inject via template engine -->
+    {{if .Error}}
+    <div class="alert">{{.Error}}</div>
+    {{end}}
+    <form method="post">
+      <input name="username" placeholder="Username" required>
+      <input name="password" type="password" placeholder="Password" required>
+      <input name="token" placeholder="MFA Code" required>
+      <input type="submit" value="Login">
+    </form>
+  </div>
+</body>
+</html>

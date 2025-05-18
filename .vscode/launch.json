@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug IAP Server",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/oauth/main.go",
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "GOLOG_LOG_LEVEL": "debug"
+        },
+        "args": [],
+        "buildFlags": "",
+        "showLog": true
+      } 
+    ]
+  }
