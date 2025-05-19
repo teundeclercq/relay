@@ -16,8 +16,8 @@ func main() {
 	localTarget := flag.String("local", "localhost:8080", "Local service to tunnel (host:port)")
 	flag.Parse()
 
-	wsUrl := fmt.Sprintf("wss://%s/ws", *relayHost)
-	origin := fmt.Sprintf("https://%s", *relayHost)
+	wsUrl := fmt.Sprintf("ws://%s/ws", *relayHost)
+	origin := fmt.Sprintf("http://%s", *relayHost)
 
 	log.Printf("Connecting to relay server at %s\n", wsUrl)
 	ws, err := websocket.Dial(wsUrl, "", origin)

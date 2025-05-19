@@ -25,8 +25,6 @@ func main() {
 
 	addr := fmt.Sprintf(":%s", *port)
 	fmt.Printf("Relay server listening on %s\n", addr)
-	log.Fatal(http.ListenAndServeTLS(":443",
-		"/etc/letsencrypt/live/relay.tdccore.nl/fullchain.pem",
-		"/etc/letsencrypt/live/relay.tdccore.nl/privkey.pem",
+	log.Fatal(http.ListenAndServe(addr,
 		nil))
 }
