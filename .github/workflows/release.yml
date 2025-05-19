@@ -34,12 +34,19 @@ jobs:
           mkdir -p dist    
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-server-${{ matrix.os }}-${{ matrix.goarch }} ./cmd/server
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-client-${{ matrix.os }}-${{ matrix.goarch }} ./cmd/client
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/tunnel-server-createUser-${{ matrix.os }}-${{ matrix.goarch }} ./cmd/createUser
 
       - name: Upload server artifact
         uses: actions/upload-artifact@v4
         with:
           name: tunnel-server-${{ matrix.os }}-${{ matrix.goarch }}
           path: dist/tunnel-server-${{ matrix.os }}-${{ matrix.goarch }}
+
+      - name: Upload server CreateUser artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tunnel-server-createUser-${{ matrix.os }}-${{ matrix.goarch }}
+          path: dist/tunnel-server-createUser-${{ matrix.os }}-${{ matrix.goarch }}
 
       - name: Upload client artifact
         uses: actions/upload-artifact@v4
