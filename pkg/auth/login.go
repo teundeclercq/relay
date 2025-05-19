@@ -17,6 +17,11 @@ var loginTemplate string
 
 func LoginHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Host != "relay.tdccore.nl" {
+			http.Error(w, "Invalid host", http.StatusForbidden)
+			return
+		}
+
 		if r.Method == http.MethodGet {
 			tmpl := template.Must(template.New("login").Parse(loginTemplate))
 			tmpl.Execute(w, nil)
