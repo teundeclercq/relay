@@ -1,86 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login - relay.tdccore.nl</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .login-container {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 360px;
-    }
-    .login-container img {
-      display: block;
-      margin: 0 auto 1rem;
-      width: 120px;
-    }
-    .login-container h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #333;
-    }
-    .login-container .alert {
-      color: #b00020;
-      background-color: #ffebee;
-      border: 1px solid #e57373;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border-radius: 4px;
-      font-size: 0.95rem;
-    }
-    .login-container input {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    .login-container input[type="submit"] {
-      background-color: #2b7cff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
-    }
-    .login-container input[type="submit"]:hover {
-      background-color: #195edc;
-    }
-    @media (max-width: 500px) {
-      .login-container {
-        margin: 0 1rem;
-      }
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-  <div class="login-container">
-    <img src="/static/logo.png" alt="Relay Logo">
-    <h2>Login to relay.tdccore.nl</h2>
-    <!-- Example flash alert, dynamically inject via template engine -->
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+    <div class="text-center mb-3">
+      <svg class="mx-auto d-block" style="max-width: 120px; height: auto;" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <rect x="0" y="0" width="60" height="60" rx="12" fill="#2B7CFF"/>
+        <path d="M20 30c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z" fill="#fff"/>
+        <path d="M30 20v-6M30 46v-6M40 30h6M14 30h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h5 class="text-center mb-4">Login to relay</h5>
+
     {{if .Error}}
-    <div class="alert">{{.Error}}</div>
+    <div class="alert alert-danger text-center" role="alert">
+      {{.Error}}
+    </div>
     {{end}}
+
     <form method="post">
-      <input name="username" placeholder="Username" required>
-      <input name="password" type="password" placeholder="Password" required>
-      <input name="token" placeholder="MFA Code" required>
-      <input type="submit" value="Login">
+      <div class="mb-3">
+        <input name="username" class="form-control" placeholder="Username" required />
+      </div>
+      <div class="mb-3">
+        <input name="password" type="password" class="form-control" placeholder="Password" required />
+      </div>
+      <div class="mb-3">
+        <input name="token" class="form-control" placeholder="MFA Code" required />
+      </div>
+      <div class="d-grid">
+        <input type="submit" class="btn btn-primary" value="Login" />
+      </div>
     </form>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
