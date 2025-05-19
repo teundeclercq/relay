@@ -32,6 +32,10 @@ func AuthorizeHandler(db *sql.DB, srv *server.Server) http.HandlerFunc {
 
 func RequireAuth(db *sql.DB, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Host != "relay.tdccore.nl" {
+			http.Error(w, "Invalid host", http.StatusForbidden)
+			return
+		}
 		_, err := GetUsernameFromSession(db, r)
 		if err != nil {
 			redirect := "/login?redirect=" + url.QueryEscape(r.URL.RequestURI())
