@@ -5,16 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 
 	"relay/pkg/auth"
 	"relay/pkg/proxy"
-
-	"golang.org/x/net/websocket"
 )
-
-var mu sync.Mutex
-var clientConn *websocket.Conn
 
 func main() {
 	port := flag.String("port", "8081", "Port to listen on")
@@ -31,5 +25,8 @@ func main() {
 
 	addr := fmt.Sprintf(":%s", *port)
 	fmt.Printf("Relay server listening on %s\n", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Fatal(http.ListenAndServeTLS(":443",
+		"/etc/letsencrypt/live/relay.tdccore.nl/fullchain.pem",
+		"/etc/letsencrypt/live/relay.tdccore.nl/privkey.pem",
+		nil))
 }
