@@ -19,9 +19,9 @@ func main() {
 
 	http.HandleFunc("/login", auth.LoginHandler(db))
 
-	http.Handle("/ws", auth.RequireAuthWS(db, proxy.HandleTunnel()))
+	http.Handle("/ws", proxy.HandleTunnel())
 
-	http.HandleFunc("/", auth.RequireAuth(db, proxy.HandleProxy()))
+	http.HandleFunc("/", proxy.HandleProxy())
 
 	addr := fmt.Sprintf(":%s", *port)
 	fmt.Printf("Relay server listening on %s\n", addr)
